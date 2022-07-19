@@ -47,6 +47,8 @@ var writer = $("writer");
 
 function key(e) {
   if (e.keyCode === 13) {
+    counter = commands.length;
+    commands.push(writer.innerHTML);
     nextLine(writer.innerHTML.toLowerCase());
     writer.innerHTML = "";
     text.value = "";
@@ -62,9 +64,9 @@ function alert(txt) {
 var helps = [
   "about    <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;learn more about me</span>",
   "projects <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;check them out on <a href='https://www.github.com/bhmohit' target='_blank'>github</a></span>",
-  "dark     <span class='help'>change to dark mode</span>",
-  "light    <span class='help'>change to light mode</span>",
-  "[color]  <span class='help'>enter any color name(words, hex, or rgb) to change the text color</span>",
+  "dark     <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;change to dark mode</span>",
+  "light    <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;change to light mode</span>",
+  "[color]  <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enter any color name(words, hex, or rgb) to change the text color</span>",
 ];
 
 var banner = [
@@ -82,12 +84,24 @@ setTimeout(function () {
   text.focus();
 }, 100);
 
+var commands = [];
+
 const before = $("before");
-function typeIt(from, e) {
-  if (e.keyCode === 13) {
-    nextLine(from.value);
-  }
+
+var counter = commands.length-1;
+
+window.addEventListener("keyup", (e)=>{
+  if(e.keyCode === 38 && counter >= 0){
+    writer.textContent = commands[counter];
+    counter-=1;
+    console.log(commands[counter])
+}else if(e.keyCode === 40 && counter != commands.length){
+  
+  console.log(commands[counter])
+  writer.textContent = commands[counter];
+  counter+=1;
 }
+})
 
 function nextLine(input) {
   let newE = document.createElement("p");
@@ -123,6 +137,7 @@ function nextLine(input) {
         if (element.className === "cursor") {
           break;
         }
+        element.style.color = "#252525";
         element.style.backgroundColor = "#D8D8D8";
       }
       break;
@@ -133,12 +148,14 @@ function nextLine(input) {
         if (element.className === "cursor") {
           break;
         }
+        element.style.color = "#39ff14";
         element.style.backgroundColor = "#252525";
       }
       break;
     case "clear":
       location.reload();
       break;
+
     case "":
       break;
 

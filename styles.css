@@ -23,7 +23,7 @@ p {
   overflow: hidden;
   white-space: nowrap;
   letter-spacing: 0.05em;
-  animation: typing 0.5s steps(30, end);
+  animation: typing 1s steps(30, end);
 }
 .xx {
   font-size: 30px;
