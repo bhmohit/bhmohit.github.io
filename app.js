@@ -84,6 +84,10 @@ setTimeout(function () {
   text.focus();
 }, 100);
 
+setTimeout(function () {
+  nextLine("help");
+}, 700);
+
 var commands = [];
 
 const before = $("before");
@@ -111,10 +115,30 @@ function nextLine(input) {
   before.append(newE);
   switch (input.trim().toLowerCase()) {
     case "about":
-      newElement.textContent = "i am mohit";
+      var txt = "👋 Hi, my name is Mohit\r\n🏫 I’m a sophomore at UBC\r\n👀 I’m interested in Web Development & Data Science\r\n🌱 I’m currently learning Three.js which utilizes the WebGL framework for 3-D web rendering\r\n💞️ I’m looking to collaborate on anything that needs me :)";
+      newElement.textContent = txt;
+      newElement.style.whiteSpace = "pre";
       newElement.className = "resultText";
       before.append(newElement);
       break;
+
+
+    case "projects": 
+    var pros = [
+      "<a href='https://devpost.com/software/gropay' target='_blank'>GroPay</a>                      <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A solution for users to effectively liquidate crypto for Interac e-transfers</span>",
+      "<a href='https://github.com/bhmohit/PasswordManager' target='_blank'>Password Manager</a>     <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A password manager using Java with a UI and a SQL database to store and retrieve information.</span>",
+      "<a href='https://github.com/bhmohit/brick-breaker' target='_blank'>Brick Breaker</a>          <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A brick breaker game using Processing, Java and OOP Concepts</span>",
+      "<a href='https://github.com/bhmohit/bhmohit.github.io' target='_blank'>this</a>               <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;What you are currently looking at</span>"
+    ];
+    let inde1 = 0;
+    setTimeout(function () {
+      pros.forEach(function (item, index) {
+        inde1 = index;
+        insert(item);
+      });
+    }, inde1 * 1000);
+      break;
+
 
     case "help":
       let inde = 0;
@@ -187,7 +211,6 @@ function addLine(text, style, time) {
     var next = document.createElement("p");
     next.innerHTML = t;
     next.className = "xx";
-
     before.parentNode.insertBefore(next, before);
 
     window.scrollTo(0, document.body.offsetHeight);
