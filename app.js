@@ -107,6 +107,8 @@ window.addEventListener("keyup", (e)=>{
 }
 })
 
+var isDark = true;
+
 function nextLine(input) {
   let newE = document.createElement("p");
   let newElement = document.createElement("p");
@@ -156,6 +158,7 @@ function nextLine(input) {
       break;
 
     case "light":
+      if (isDark) {
       var elements = document.getElementsByTagName("*");
       for (element of elements) {
         if (element.className === "cursor") {
@@ -163,10 +166,15 @@ function nextLine(input) {
         }
         element.style.color = "#252525";
         element.style.backgroundColor = "#D8D8D8";
+      }isDark = false;} else {
+        newElement.textContent = "You are already in light mode!"
+        newElement.className = "resultText";
+        before.append(newElement);
       }
       break;
 
     case "dark":
+      if (!isDark) {
       var elements = document.getElementsByTagName("*");
       for (element of elements) {
         if (element.className === "cursor") {
@@ -175,6 +183,12 @@ function nextLine(input) {
         element.style.color = "#39ff14";
         element.style.backgroundColor = "#252525";
       }
+      isDark = true;
+    } else {
+      newElement.textContent = "You are already in dark mode!"
+      newElement.className = "resultText";
+      before.append(newElement);
+    }
       break;
     case "clear":
       location.reload();
