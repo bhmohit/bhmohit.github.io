@@ -78,15 +78,22 @@ var banner = [
   "\\_|  |_/ \\___/ |_| |_||_| \\__|",
 ];
 
-//initial
-setTimeout(function () {
-  loopLines(banner, "", 80);
-  text.focus();
-}, 100);
 
-setTimeout(function () {
-  nextLine("help");
-}, 700);
+
+const bannerFunction = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      loopLines(banner, "", 100);
+      text.focus();
+      resolve();
+    }, 0)
+  })
+}
+
+bannerFunction()
+.then (() => {
+  setTimeout(() => {nextLine("help")}, 710)
+})
 
 var commands = [];
 
@@ -143,14 +150,9 @@ function nextLine(input) {
 
 
     case "help":
-      let inde = 0;
-      setTimeout(function () {
-        helps.forEach(function (item, index) {
-          inde = index;
+      helps.forEach(function (item, index) {
           insert(item);
-        });
-      }, inde * 1000);
-
+      });
       break;
 
     case "banner":
