@@ -134,7 +134,7 @@ function nextLine(input) {
 
     case "projects": 
     var pros = [
-      "<a href='https://devpost.com/software/NBAViz' target='_blank'>NBAViz</a>                      <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An app which showcases NBA player stats and predictions using graphical visuals.</span>",
+      "<a href='https://nbaviz.bhmohit.dev/' target='_blank'>NBAViz</a>                      <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An app which showcases NBA player stats and predictions using graphical visuals.</span>",
       "<a href='https://devpost.com/software/gropay' target='_blank'>GroPay</a>                      <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A solution for users to effectively liquidate crypto for Interac e-transfers</span>",
       "<a href='https://github.com/bhmohit/SecureVault' target='_blank'>Password Manager</a>     <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A password manager using Java with a UI and a SQL database to store and retrieve information.</span>",
       "<a href='https://github.com/bhmohit/brick-breaker' target='_blank'>Brick Breaker</a>          <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A brick breaker game using Processing, Java and OOP Concepts</span>",
