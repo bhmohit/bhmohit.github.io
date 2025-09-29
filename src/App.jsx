@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 const BANNER = [
   "___  ___        _      _  _",
@@ -53,15 +53,15 @@ export default function App() {
   useEffect(() => {
     const fg = isDark ? "#39ff14" : "#252525";
     const bg = isDark ? "#252525" : "#D8D8D8";
-    const all = document.getElementsByTagName("*");
-    for (const el of all) {
-      if (el.className === "cursor") break;
-      el.style.color = fg;
-      el.style.backgroundColor = bg;
-    }
+    const root = document.documentElement;
+    root.style.setProperty('--fg', fg);
+    root.style.setProperty('--bg', bg);
   }, [isDark]);
 
+  const didInitRef = useRef(false);
   useEffect(() => {
+    if (didInitRef.current) return;
+    didInitRef.current = true;
     (async () => {
       await printBanner(0);
       setTimeout(() => handleCommand("help"), 710);
@@ -89,21 +89,8 @@ export default function App() {
   }
 
   function addLine(text, time) {
-    const withNbsp = (() => {
-      let t = "";
-      for (let i = 0; i < text.length; i++) {
-        if (text.charAt(i) === " " && text.charAt(i + 1) === " ") {
-          t += "&nbsp;&nbsp;";
-          i++;
-        } else {
-          t += text.charAt(i);
-        }
-      }
-      return t;
-    })();
-
     setTimeout(() => {
-      print(withNbsp, { html: true, className: "xx" });
+      print(text, { html: false, className: "xx" });
     }, time);
   }
 
@@ -164,6 +151,7 @@ export default function App() {
         setLines([]);
         setInput("");
         setIsDark(true);
+        // Reprint banner+help once after clearing
         setTimeout(async () => {
           await printBanner(0);
           setTimeout(() => handleCommand("help"), 710);
@@ -172,7 +160,7 @@ export default function App() {
       }
       default: {
         const color = cmd.replace(/\s+/g, "");
-        try { document.body.style.color = color; } catch {}
+        try { document.documentElement.style.setProperty('--fg', color); } catch {}
         break;
       }
     }
@@ -238,15 +226,25 @@ export default function App() {
     <div ref={rootRef} className="body">
       <div className="text">
         <div>
-          {lines.map((l) => (
-            <p
-              key={l.id}
-              className={l.className || (l.html ? "resultText" : undefined)}
-              dangerouslySetInnerHTML={l.html ? { __html: l.text } : undefined}
-            >
-              {!l.html ? l.text : null}
-            </p>
-          ))}
+          {lines.map((l) => {
+            const cls = l.className || (l.html ? "resultText" : undefined);
+            if (!l.html && l.className === 'xx') {
+              return (
+                <pre key={l.id} className={cls}>
+                  {l.text}
+                </pre>
+              );
+            }
+            return (
+              <p
+                key={l.id}
+                className={cls}
+                dangerouslySetInnerHTML={l.html ? { __html: l.text } : undefined}
+              >
+                {!l.html ? l.text : null}
+              </p>
+            );
+          })}
         </div>
       </div>
 
