@@ -1,0 +1,36 @@
+# Node dependencies
+node_modules/
+
+# Build output
+dist/
+.vite/
+
+# Logs
+logs
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Icon?
+.Spotlight-V100
+.Trashes
+
+# Misc
+*.swp
+*.swo
+coverage/
+*.lcov

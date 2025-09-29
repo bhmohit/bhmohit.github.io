@@ -5,27 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mohit</title>
-    <link rel="stylesheet" href="styles.css" />
+    
   </head>
 
-  <body class="body">
-    <div class="text">
-      <div id="before"></div>
-    </div>
-
-    <div id="terminal" onclick="$('setter').focus();">
-      <textarea
-        type="text"
-        id="setter"
-        onkeydown="writeit(this, event);moveIt(this.value.length, event)"
-        onkeyup="writeit(this, event)"
-        onkeypress="writeit(this, event);"
-        autofocus
-      ></textarea>
-      <div id="getter">
-        <span id="writer"></span><b class="cursor" id="cursor"></b>
-      </div>
-    </div>
-    <script src="app.js"></script>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
