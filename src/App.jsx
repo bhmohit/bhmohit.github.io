@@ -1,43 +1,37 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import SnakeGame from './components/SnakeGame.jsx'
+import TerminalOutput from './components/TerminalOutput.jsx'
+import TerminalInput from './components/TerminalInput.jsx'
+import MacHeader from './components/MacHeader.jsx'
+import BlogWindow from './components/BlogWindow.jsx'
+import posts from './blog/posts.js'
+import { BANNER, HELPS, PROJECTS } from './data/constants.jsx'
+import useAutoScroll from './hooks/useAutoScroll.jsx'
 
-const BANNER = [
-  "___  ___        _      _  _",
-  "|  \\/  |       | |    (_)| |",
-  "| .  . |  ___  | |__   _ | |",
-  "| |\\/| | / _ \\ | '_ \\ | || __|",
-  "| |  | || (_) || | | || || |",
-  "\\_|  |_/ \\___/ |_| |_||_| \\__|",
-];
-
-const HELPS = [
-  "about    <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;learn more about me</span>",
-  "projects <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;check them out on <a href='https://www.github.com/bhmohit' target='_blank'>github</a></span>",
-  "dark     <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;change to dark mode</span>",
-  "light    <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;change to light mode</span>",
-  "[color]  <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enter any color name(words, hex, or rgb) to change the text color</span>",
-];
-
-const PROJECTS = [
-  "<a href='https://nbaviz.bhmohit.dev/' target='_blank'>NBAViz</a>                      <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An app which showcases NBA player stats and predictions using graphical visuals.</span>",
-  "<a href='https://devpost.com/software/gropay' target='_blank'>GroPay</a>                      <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A solution for users to effectively liquidate crypto for Interac e-transfers</span>",
-  "<a href='https://github.com/bhmohit/SecureVault' target='_blank'>Password Manager</a>     <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A password manager using Java with a UI and a SQL database to store and retrieve information.</span>",
-  "<a href='https://github.com/bhmohit/brick-breaker' target='_blank'>Brick Breaker</a>          <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A brick breaker game using Processing, Java and OOP Concepts</span>",
-  "<a href='https://github.com/bhmohit/bhmohit.github.io' target='_blank'>this</a>               <span class='help'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;What you are currently looking at</span>",
-];
-
-function nl2br(txt) {
-  return txt.replace(/\n/g, "");
-}
+const stripNewlines = (txt) => txt.replace(/\n/g, "");
 
 export default function App() {
+  const MAX_LINES = 300;
+  const trimLines = (arr) => (arr.length > MAX_LINES ? arr.slice(arr.length - MAX_LINES) : arr);
   const [lines, setLines] = useState([]);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState([]);
   const [histIndex, setHistIndex] = useState(null);
   const [isDark, setIsDark] = useState(true);
   const [caretLeftPx, setCaretLeftPx] = useState(0);
+  const [showSnake, setShowSnake] = useState(false);
+  const [showBlog, setShowBlog] = useState(false);
+  const [activePost, setActivePost] = useState(null);
+  const [userHost, setUserHost] = useState(() => {
+    try {
+      const cached = localStorage.getItem('userHost');
+      return cached || 'guest';
+    } catch {
+      return 'guest';
+    }
+  });
+  const [wallpaper, setWallpaper] = useState('default'); // 'default' | 'vibrant'
   const rootRef = useRef(null);
-  const writerRef = useRef(null);
   const hiddenInputRef = useRef(null);
 
   useEffect(() => {
@@ -51,12 +45,47 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const fg = isDark ? "#39ff14" : "#252525";
+    const fg = isDark ? "#ffffff" : "#252525";
     const bg = isDark ? "#252525" : "#D8D8D8";
     const root = document.documentElement;
     root.style.setProperty('--fg', fg);
     root.style.setProperty('--bg', bg);
   }, [isDark]);
+
+  // Reflect userHost in CSS so the initial prompt pseudo-element uses it
+  useEffect(() => {
+    try {
+      document.documentElement.style.setProperty('--prompt', `"${userHost}@bhmohit.dev ~ %"`);
+      localStorage.setItem('userHost', userHost);
+    } catch {}
+  }, [userHost]);
+
+  // Fetch public IP for prompt label; timeout-friendly fallback to 'guest'
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const controller = new AbortController();
+        const tid = setTimeout(() => controller.abort(), 1500);
+        const res = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+        clearTimeout(tid);
+  if (!res.ok) return;
+        const data = await res.json();
+        const ip = String(data?.ip || '').trim();
+        if (!cancelled && ip) setUserHost(ip);
+      } catch (_) {
+        // ignore; keep 'guest'
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Apply wallpaper and overlay based on state
+  useEffect(() => {
+    const root = document.body;
+    const url = wallpaper === 'vibrant' ? "url('/macos-wallpaper-vibrant.svg')" : "url('/macos-wallpaper.svg')";
+    root.style.setProperty('--wallpaper-url', url);
+  }, [wallpaper]);
 
   const didInitRef = useRef(false);
   useEffect(() => {
@@ -76,16 +105,20 @@ export default function App() {
   }
 
   function print(text, { html = false, className } = {}) {
-    setLines(prev => [...prev, { id: nextId(), text, html, className }]);
+    setLines(prev => trimLines([...prev, { id: nextId(), text, html, className }]));
   }
 
   function printPrompt(cmd) {
-    print(`guest@mohit.dev:~$ ${cmd}`);
+    print(`${userHost}@bhmohit.dev ~ % ${cmd}`);
   }
 
-  function insertHtml(htmlStr) {
-    print(htmlStr, { html: true, className: "resultText" });
-    window.scrollTo(0, document.body.offsetHeight);
+  function printJSX(node, className = "resultText") {
+    setLines(prev => trimLines([...prev, { id: nextId(), jsx: node, className }]));
+    // Scroll the terminal text area, not the entire window
+    requestAnimationFrame(() => {
+      const el = document.querySelector('.text');
+      if (el) el.scrollTop = el.scrollHeight;
+    });
   }
 
   function addLine(text, time) {
@@ -119,32 +152,107 @@ export default function App() {
   }
 
   function runCommand(cmd) {
+    // Pattern commands first
+    if (cmd === 'color') {
+      printJSX(<span>Usage: color &lt;name|#hex|rgb(...)&gt;</span>);
+      return;
+    }
+    if (cmd.startsWith('color ')) {
+      const value = cmd.slice(6).trim();
+      if (!value) {
+        printJSX(<span>Usage: color &lt;name|#hex|rgb(...)&gt;</span>);
+        return;
+      }
+      try { document.documentElement.style.setProperty('--fg', value); } catch {}
+      return;
+    }
     switch (cmd) {
       case "about": {
-        const txt = "👋 Hi, my name is Mohit\r\n🏫 I’m a sophomore at UBC\r\n👀 I’m interested in Web Development & Data Science\r\n🌱 I’m currently learning Three.js which utilizes the WebGL framework for 3-D web rendering\r\n💞️ I’m looking to collaborate on anything that needs me :)";
-        insertHtml(`<span class="resultText" style="white-space:pre">${txt}</span>`);
+          const txt = "👋 Hi, I'm Mohit\r\n🏫 I’m a senior at UBC\r\n👀 I’m most entertained by solving problems that deal with distributed systems\r\n🌱 I’m currently learning about parallel architectures and OS development\r\n✌🏽 I’m looking to solve and collaborate on challenging problems regarding large-scale systems :)";
+          printJSX(<span style={{ whiteSpace: 'pre' }}>{txt}</span>, 'resultText');
         break;
       }
       case "projects": {
-        PROJECTS.forEach((item) => insertHtml(`<span class="resultText">${item}</span>`));
+        PROJECTS.forEach(({ label, url, desc }) => {
+          printJSX(
+            <span className="resultRow">
+              <span className="col1">
+                <a href={url} target="_blank" rel="noopener noreferrer">{label}</a>
+              </span>
+              <span className="col2">{desc}</span>
+            </span>
+          );
+        });
         break;
       }
       case "help": {
-        HELPS.forEach((item) => insertHtml(`<span class="resultText">${item}</span>`));
+        HELPS.forEach(({ cmd, desc }) => {
+          printJSX(
+            <span className="resultRow">
+              <span className="col1">{cmd}</span>
+              <span className="col2">{desc}</span>
+            </span>
+          );
+        });
         break;
       }
       case "banner": {
         printBanner(0, 80);
         break;
       }
+      case "snake": {
+        setShowSnake(true);
+        break;
+      }
+      case "thoughts": {
+        setShowBlog(true);
+        setActivePost(null);
+        break;
+      }
       case "light": {
         if (isDark) setIsDark(false);
-        else insertHtml(`<span class="resultText">You are already in light mode!</span>`);
+        else printJSX(<span>You are already in light mode!</span>);
         break;
       }
       case "dark": {
         if (!isDark) setIsDark(true);
-        else insertHtml(`<span class="resultText">You are already in dark mode!</span>`);
+        else printJSX(<span>You are already in dark mode!</span>);
+        break;
+      }
+      case "wallpaper": {
+        printJSX(
+          <span>
+            Usage: wallpaper [default|vibrant|overlay:light|overlay:med|overlay:strong]
+          </span>
+        );
+        break;
+      }
+      case "wallpaper default": {
+        setWallpaper('default');
+        printJSX(<span>Wallpaper set to default.</span>);
+        break;
+      }
+      case "wallpaper vibrant": {
+        setWallpaper('vibrant');
+        printJSX(<span>Wallpaper set to vibrant.</span>);
+        break;
+      }
+      case "wallpaper overlay:light": {
+        document.body.style.setProperty('--overlay-inner', '0.08');
+        document.body.style.setProperty('--overlay-outer', '0.28');
+        printJSX(<span>Overlay set to light.</span>);
+        break;
+      }
+      case "wallpaper overlay:med": {
+        document.body.style.setProperty('--overlay-inner', '0.15');
+        document.body.style.setProperty('--overlay-outer', '0.45');
+        printJSX(<span>Overlay set to medium.</span>);
+        break;
+      }
+      case "wallpaper overlay:strong": {
+        document.body.style.setProperty('--overlay-inner', '0.22');
+        document.body.style.setProperty('--overlay-outer', '0.6');
+        printJSX(<span>Overlay set to strong.</span>);
         break;
       }
       case "clear": {
@@ -159,8 +267,16 @@ export default function App() {
         break;
       }
       default: {
-        const color = cmd.replace(/\s+/g, "");
-        try { document.documentElement.style.setProperty('--fg', color); } catch {}
+        // blog <slug>: open a specific post
+        if (cmd.startsWith('thoughts ')) {
+          const slug = cmd.slice(9).trim();
+          if (slug) {
+            setShowBlog(true);
+            setActivePost(slug);
+            break;
+          }
+        }
+        printJSX(<span>idk what that means</span>);
         break;
       }
     }
@@ -211,9 +327,7 @@ export default function App() {
     }
   }
 
-  useEffect(() => {
-    window.scrollTo(0, document.body.offsetHeight);
-  }, [lines]);
+  useAutoScroll('.text', [lines]);
 
   useEffect(() => {
     const min = -Math.max(0, (input.length - 1) * 10);
@@ -223,48 +337,43 @@ export default function App() {
   const caretLeft = useMemo(() => `${caretLeftPx}px`, [caretLeftPx]);
 
   return (
-    <div ref={rootRef} className="body">
-      <div className="text">
-        <div>
-          {lines.map((l) => {
-            const cls = l.className || (l.html ? "resultText" : undefined);
-            if (!l.html && l.className === 'xx') {
-              return (
-                <pre key={l.id} className={cls}>
-                  {l.text}
-                </pre>
-              );
-            }
-            return (
-              <p
-                key={l.id}
-                className={cls}
-                dangerouslySetInnerHTML={l.html ? { __html: l.text } : undefined}
-              >
-                {!l.html ? l.text : null}
-              </p>
-            );
-          })}
+    <div ref={rootRef} className="body" style={{ '--prompt': `"${userHost}@bhmohit.dev ~ %"` }}>
+  <MacHeader leftLabel={`You: ${userHost}`} title="Me: bhmohit.dev" />
+      <div className="window">
+        <div className="window-header">
+          <div className="window-controls" aria-hidden>
+            <span className="control close" />
+            <span className="control minimize" />
+            <span className="control maximize" />
+          </div>
+          <div className="window-title">terminal</div>
         </div>
-      </div>
+        <div className="window-body">
+          <div className="text">
+            <TerminalOutput lines={lines} />
+          </div>
 
-      <div id="terminal" onClick={() => { if (hiddenInputRef.current) hiddenInputRef.current.focus(); }}>
-        <textarea
-          id="setter"
-          value={input}
-          onChange={(e) => setInput(nl2br(e.target.value))}
-          onKeyDown={onKeyDown}
-          autoFocus
-          ref={hiddenInputRef}
-          style={{ left: "-1000px", position: "absolute" }}
-        />
-        <div id="getter">
-          <span
-            id="writer"
-            ref={writerRef}
-            dangerouslySetInnerHTML={{ __html: input }}
+          <TerminalInput
+            ref={hiddenInputRef}
+            input={input}
+            setInput={setInput}
+            nl2br={stripNewlines}
+            onKeyDown={onKeyDown}
+            caretLeft={caretLeft}
+            showSnake={showSnake || showBlog}
           />
-          <b className="cursor" id="cursor" style={{ left: caretLeft }}></b>
+
+          {showSnake && (
+            <SnakeGame onExit={() => setShowSnake(false)} />
+          )}
+          {showBlog && (
+            <BlogWindow
+              posts={posts}
+              activeSlug={activePost}
+              onOpenPost={setActivePost}
+              onClose={() => { setShowBlog(false); setActivePost(null); }}
+            />
+          )}
         </div>
       </div>
     </div>
