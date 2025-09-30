@@ -168,7 +168,7 @@ export default function App() {
     }
     switch (cmd) {
       case "about": {
-          const txt = "👋 Hi, I'm Mohit\r\n🏫 I’m a senior at UBC\r\n👀 I’m most entertained by solving problems that deal with distributed systems\r\n🌱 I’m currently learning about parallel architectures and OS development\r\n✌🏽 I’m looking to solve and collaborate on challenging problems regarding large-scale systems :)";
+          const txt = "👋 Hi, I'm Mohit\r\n🏫 I’m a senior at UBC\r\n👀 I’m most entertained by solving problems that deal with distributed systems\r\n🌱 I’m currently learning about parallel architectures and OS development\r\n✌🏽 I’m looking to collaborate on problems regarding large-scale systems :)";
           printJSX(<span style={{ whiteSpace: 'pre' }}>{txt}</span>, 'resultText');
         break;
       }
