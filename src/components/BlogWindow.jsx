@@ -1,4 +1,3 @@
-import React from 'react';
 import defaultPosts from '../blog/posts.js';
 
 export default function BlogWindow({ posts = defaultPosts, activeSlug, onClose, onOpenPost }) {

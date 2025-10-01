@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default function TerminalLine({ line }) {
   const cls = line.className || undefined;

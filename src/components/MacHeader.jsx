@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import WifiIcon from './icons/WifiIcon.jsx';
 import BatteryIcon from './icons/BatteryIcon.jsx';
 

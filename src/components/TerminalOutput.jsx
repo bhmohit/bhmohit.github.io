@@ -1,4 +1,3 @@
-import React from 'react';
 import TerminalLine from './TerminalLine.jsx';
 
 export default function TerminalOutput({ lines }) {
