@@ -9,7 +9,7 @@ export default function BlogWindow({ posts = defaultPosts, activeSlug, onClose, 
       <div className="blogContainer">
         <div className="blogHeader">
           <div>
-            {!post && <strong>bhmohit.dev — blog</strong>}
+            {!post && <strong>my thoughts on things</strong>}
           </div>
           <div className="blogActions">
             {post ? (
