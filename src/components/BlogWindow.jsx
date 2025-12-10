@@ -1,6 +1,8 @@
 import defaultPosts from '../blog/posts.js';
 
 export default function BlogWindow({ posts = defaultPosts, activeSlug, onClose, onOpenPost }) {
+  // Sort newest first without mutating the source array.
+  const sortedPosts = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
   const post = activeSlug ? posts.find(p => p.slug === activeSlug) : null;
 
   return (
@@ -21,7 +23,7 @@ export default function BlogWindow({ posts = defaultPosts, activeSlug, onClose, 
         <div className="blogBody">
           {!post && (
             <div className="blogList">
-              {posts.map(p => (
+              {sortedPosts.map(p => (
                 <div key={p.slug} className="blogItem" onClick={() => onOpenPost(p.slug)} role="button" tabIndex={0}
                      onKeyDown={(e) => { if (e.key === 'Enter') onOpenPost(p.slug); }}>
                   <div className="blogItemTitle">{p.title}</div>

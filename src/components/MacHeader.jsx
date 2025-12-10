@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react';
 import WifiIcon from './icons/WifiIcon.jsx';
 import BatteryIcon from './icons/BatteryIcon.jsx';
 
-function formatNow() {
+function formatNow(compact = false) {
   const now = new Date();
+  if (compact) {
+    return now.toLocaleTimeString(undefined, {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  }
   const date = now.toLocaleDateString(undefined, {
     weekday: 'short',
     month: 'short',
@@ -17,11 +23,23 @@ function formatNow() {
 }
 
 export default function MacHeader({ leftLabel = 'bhmohit', title = 'Terminal' }) {
-  const [label, setLabel] = useState(formatNow());
+  const [isCompact, setIsCompact] = useState(() => (typeof window !== 'undefined' ? window.innerWidth <= 480 : false));
+  const [label, setLabel] = useState(formatNow(isCompact));
 
+  // Update clock every second, respecting compact mode
   useEffect(() => {
-    const id = setInterval(() => setLabel(formatNow()), 1000);
+    const id = setInterval(() => setLabel(formatNow(isCompact)), 1000);
     return () => clearInterval(id);
+  }, [isCompact]);
+
+  // Listen for window resizes to switch between full and compact clock
+  useEffect(() => {
+    function onResize() {
+      const compactNow = window.innerWidth <= 480;
+      setIsCompact(compactNow);
+    }
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   return (
@@ -31,8 +49,8 @@ export default function MacHeader({ leftLabel = 'bhmohit', title = 'Terminal' })
         <div className="mac-header__center" aria-hidden>{title}</div>
         <div className="mac-header__right" aria-live="polite">
           <div className="mac-status">
-            <WifiIcon className="mac-icon" />
-            <BatteryIcon className="mac-icon" percent={100} />
+            <WifiIcon className="mac-icon mac-wifi" />
+            <BatteryIcon className="mac-icon mac-battery" percent={100} />
             <span className="mac-clock">{label}</span>
           </div>
         </div>
