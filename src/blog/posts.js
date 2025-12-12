@@ -62,8 +62,8 @@ const posts = [
     slug: 'faas',
     title: 'FaaS (Food as a Service)',
     date: 'Dec 11, 2025',
-    tags: ['thought for food'],
-    summary: 'Why dinner now feels like a subscription tier instead of a meal',
+    tags: ['thoughts for food (yes, in that order)'],
+    summary: 'Why does dinner feel like a subscription tier instead of a meal',
     links: [],
     content: [
       { type: 'p', text: 'What do I know about food? I do not have a culinary degree and I have never worked a line, but I am passionate enough to tell handmade pasta from the boxed factory stuff in one bite.' },
