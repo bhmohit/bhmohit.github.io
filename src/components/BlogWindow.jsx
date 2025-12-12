@@ -62,6 +62,40 @@ export default function BlogWindow({ posts = defaultPosts, activeSlug, onClose, 
                     case 'img': return <img key={idx} src={block.src} alt={block.alt||''} className="blogImg" />;
                     case 'a': return <p key={idx}><a href={block.href} target="_blank" rel="noopener noreferrer">{block.text||block.href}</a></p>;
                     case 'code': return <pre key={idx} className="blogCode"><code>{block.text}</code></pre>;
+                    case 'video': {
+                      const isEmbed = block.embed || /youtube|vimeo/.test(block.src || "");
+                      const caption = block.caption ? <div className="blogMediaCaption">{block.caption}</div> : null;
+                      if (isEmbed) {
+                        return (
+                          <div key={idx} className="blogVideoWrapper">
+                            <div className="blogVideoEmbed">
+                              <iframe
+                                src={block.src}
+                                title={block.title || `${post.title} video ${idx + 1}`}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                loading="lazy"
+                              />
+                            </div>
+                            {caption}
+                          </div>
+                        );
+                      }
+                      return (
+                        <div key={idx} className="blogVideoWrapper">
+                          <video
+                            className="blogVideo"
+                            src={block.src}
+                            poster={block.poster}
+                            controls
+                            preload="metadata"
+                          >
+                            Sorry, your browser does not support embedded videos.
+                          </video>
+                          {caption}
+                        </div>
+                      );
+                    }
                     default: return <p key={idx}>{block.text||''}</p>;
                   }
                 })}
