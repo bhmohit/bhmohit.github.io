@@ -63,7 +63,7 @@ const posts = [
     title: 'FaaS (Food as a Service)',
     date: 'Dec 11, 2025',
     tags: ['thoughts for food (yes, in that order)'],
-    summary: 'Why does dinner feel like a subscription tier instead of a meal',
+    summary: 'Why does dinner feel like a subscription instead of a meal',
     links: [],
     content: [
       { type: 'p', text: 'What do I know about food? I do not have a culinary degree and I have never worked a line, but I am passionate enough to tell handmade pasta from the boxed factory stuff in one bite.' },
@@ -74,7 +74,7 @@ const posts = [
       { type: 'p', text: 'Food is supposed to taste like something, not perform like a startups elevator pitch. The best meals I have had were in rooms that smelled like garlic and butter.' },
       { type: 'video', src: 'https://www.youtube.com/embed/n6DLqK6v364', title: 'How to finish pasta like you mean it', caption: 'Watch how the sauce comes together with pasta water and cheese instead of cream from a carton.', embed: true },
       { type: 'p', text: 'The technique is what matters: starch, fat, spices, flavours and heat working together. It is the difference between noodles wearing sauce and noodles swimming in soup.' },
-      { type: 'p', text: 'I want to pay for craft and story, not for a subscription tier that unlocks a chair. But what do I know? If you have a small spot doing honest cooking, please tell me (extra brownie points if theres a old grandma behind the counter).' },
+      { type: 'p', text: 'I want to pay for craft and story, not for a subscription that unlocks a chair. But what do I know? If you have a small spot doing honest cooking, please tell me (extra brownie points if theres a old grandma behind the counter).' },
     ]
   },
 ];
